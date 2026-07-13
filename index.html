@@ -93,6 +93,8 @@ const CFG={
   wallGap:        55,     // мм: внешний = +wallGap, внутренний = −wallGap
   bedHeight:      320,    // ВЫСОТА грядки внешняя, мм — меняется для др. конфигураций
   soilDepth:      300,    // высота засыпки грунта, мм
+  weightModule900: 21,    // вес модуля 900 мм (2 секции), кг
+  weightModule485: 9.2,   // вес модуля 485 мм (2 секции), кг
   configAnchor:   '#astra-configs'  // якорь блока с конфигурациями ниже на странице Tilda
 };
 /* ========================================================================== */
@@ -140,7 +142,8 @@ function update(){
   document.getElementById('mWid').textContent=(Math.round(sp.widExt/10)/100).toFixed(2)+' м';
   document.getElementById('mHgt').textContent=(Math.round(CFG.bedHeight/10)/100).toFixed(2)+' м';
   document.getElementById('mSoil').textContent=Math.round(soilL)+' л';
-  document.getElementById('aux').textContent='Площадь посадки — '+areaM.toFixed(2)+' м²';
+  const weight=sp.n900*CFG.weightModule900+sp.n485*CFG.weightModule485;
+  document.getElementById('aux').textContent='Площадь посадки — '+areaM.toFixed(2)+' м² · вес ~'+(Math.round(weight*10)/10)+' кг';
   document.querySelectorAll('#chips .chip').forEach(el=>el.classList.toggle('on',+el.dataset.n===N));
   document.querySelectorAll('#sw .sw').forEach(el=>el.classList.toggle('on',el.dataset.c===color));
 }
