@@ -24,6 +24,16 @@
   .info{min-width:0;}
   .price-val{font-family:var(--font-head);font-size:29px;font-weight:700;color:var(--green);line-height:1;font-variant-numeric:tabular-nums;letter-spacing:.01em;}
   .price-break{font-size:13.5px;color:var(--muted);margin:9px 0 4px;line-height:1.5;overflow-wrap:anywhere;}
+  /* Быстрый доступ (верхний правый угол): PDF-инструкция + переход к видео */
+  .tophead{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;}
+  .acts{display:flex;gap:10px;flex:0 0 auto;}
+  .act{display:flex;flex-direction:column;align-items:center;gap:5px;text-decoration:none;cursor:pointer;}
+  .act-ic{width:46px;height:46px;border-radius:13px;background:#E4EFE9;display:flex;align-items:center;justify-content:center;transition:background .15s,box-shadow .15s,transform .15s;}
+  .act:hover .act-ic{background:var(--green);box-shadow:0 5px 14px rgba(0,109,94,.28);transform:translateY(-1px);}
+  .act-ic svg{width:23px;height:23px;display:block;fill:none;stroke:var(--green);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s;}
+  .act:hover .act-ic svg{stroke:#fff;}
+  .act-lb{font-size:11px;color:var(--muted);font-weight:600;white-space:nowrap;letter-spacing:.01em;}
+  .act:hover .act-lb{color:var(--green);}
   .lab{font-size:12.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:18px 0 8px;font-weight:600;}
   .opts{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;}
   .opts.sws{display:flex;flex-wrap:wrap;gap:10px;}
@@ -61,6 +71,7 @@
   @media(max-width:900px){
     .card{grid-template-columns:1fr;gap:18px;align-items:start;}
     .stage{aspect-ratio:4/3;max-height:56vh;}
+    .acts{display:none;}         /* иконки быстрого доступа — пока только десктоп */
     .price-val{font-size:26px;}
     .feat{padding:20px 18px;margin-top:20px;}
     .feat-grid{grid-template-columns:1fr;gap:16px;}
@@ -80,7 +91,19 @@
   <div class="stage"><img id="imgA" alt="Грядка АСТРА"><img id="imgB" alt="" style="opacity:0"></div>
   <div class="col">
   <div class="info">
-    <div class="price-val" id="pVal">—</div>
+    <div class="tophead">
+      <div class="price-val" id="pVal">—</div>
+      <div class="acts">
+        <a class="act" id="actPdf" title="Инструкция по монтажу (PDF)" target="_blank" rel="noopener">
+          <span class="act-ic"><svg viewBox="0 0 24 24"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M18 21H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8l6 6v10a2 2 0 0 1-2 2z"/><path d="M9 13h6M9 17h4"/></svg></span>
+          <span class="act-lb">Инструкция</span>
+        </a>
+        <a class="act" id="actVideo" title="Видео-инструкция монтажа">
+          <span class="act-ic"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M11 9.4l4.2 2.6-4.2 2.6z"/></svg></span>
+          <span class="act-lb">Видео</span>
+        </a>
+      </div>
+    </div>
     <div class="price-break" id="pBreak">—</div>
     <div class="lab">Цвет</div>
     <div class="opts sws" id="sw"></div>
@@ -136,6 +159,8 @@ const CFG={
   weightModule900: 21,    // вес модуля 900 мм (2 секции), кг
   weightModule485: 9.2,   // вес модуля 485 мм (2 секции), кг
   configAnchor:   '#astra-configs',  // якорь блока с конфигурациями ниже на странице Tilda
+  videoAnchor:    '#astra-video',    // якорь блока с ВИДЕО-инструкцией ниже на странице Tilda
+  pdfUrl:         '',                // ссылка на PDF-инструкцию по монтажу (откроется в новой вкладке); пусто → «скоро»
   // Корзина (см. INSTALL_TILDA.md): картинка товара берётся по URL (не base64) с GitHub Pages,
   // добавление в корзину идёт через postMessage к родительской странице Tilda.
   imgBase:        'https://plotnikovvladimir-stack.github.io/astra-gryadka-calc/img/', // <цвет>/<n>.webp
@@ -234,7 +259,10 @@ for(let k=1;k<=7;k++){const b=document.createElement('button');b.className='chip
 const sw=document.getElementById('sw');
 COLORS.forEach(c=>{const b=document.createElement('button');b.className='sw';b.dataset.c=c.key;b.style.background=c.sw;b.title=c.name;b.setAttribute('aria-label',c.name);b.onclick=()=>{color=c.key;update();};sw.appendChild(b);});
 document.getElementById('cartBtn').onclick=addToCart;
-document.getElementById('cfgLink').onclick=function(){const t=document.querySelector(CFG.configAnchor);if(t)t.scrollIntoView({behavior:'smooth'});else if(inIframe())window.parent.postMessage({type:'astra:scrollTo',anchor:CFG.configAnchor},'*');else location.hash=CFG.configAnchor;};
+function goAnchor(a){const t=document.querySelector(a);if(t)t.scrollIntoView({behavior:'smooth'});else if(inIframe())window.parent.postMessage({type:'astra:scrollTo',anchor:a},'*');else location.hash=a;}
+document.getElementById('cfgLink').onclick=function(){goAnchor(CFG.configAnchor);};
+document.getElementById('actVideo').onclick=function(e){e.preventDefault();goAnchor(CFG.videoAnchor);};
+(function(){var a=document.getElementById('actPdf');if(CFG.pdfUrl){a.href=CFG.pdfUrl;}else{a.href='#';a.onclick=function(e){e.preventDefault();alert('PDF-инструкция по монтажу скоро будет подключена');};}})();
 imgs[0].onload=reportHeight;
 imgs[0].src=imgUrl(color,N); update();
 window.addEventListener('load',reportHeight);
