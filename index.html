@@ -25,11 +25,14 @@
   .price-val{font-family:var(--font-head);font-size:29px;font-weight:700;color:var(--green);line-height:1;font-variant-numeric:tabular-nums;letter-spacing:.01em;}
   .price-break{font-size:13.5px;color:var(--muted);margin:9px 0 4px;line-height:1.5;overflow-wrap:anywhere;}
   /* Быстрый доступ к инструкциям: подпись + иконки (документ=PDF, плей=видео) */
-  .docs{display:flex;align-items:center;gap:10px;margin:14px 0 2px;}
-  .docs-lb{font-size:12.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600;}
-  .doc-ic{width:34px;height:34px;border-radius:9px;background:#E4EFE9;display:flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none;transition:background .15s,transform .15s;}
+  /* стек: подпись сверху, иконки под ней; поля/размер подобраны так, чтобы
+     суммарная высота зоны (расшифровка цены → ЦВЕТ) не изменилась */
+  .docs{display:flex;flex-direction:column;align-items:flex-start;gap:4px;margin:8px 0 -9px;}
+  .docs-lb{font-size:12.5px;line-height:1;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600;}
+  .docs-row{display:flex;gap:10px;}
+  .doc-ic{width:32px;height:32px;border-radius:9px;background:#E4EFE9;display:flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none;transition:background .15s,transform .15s;}
   .doc-ic:hover{background:var(--green);transform:translateY(-1px);}
-  .doc-ic svg{width:18px;height:18px;display:block;fill:none;stroke:var(--green);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s;}
+  .doc-ic svg{width:17px;height:17px;display:block;fill:none;stroke:var(--green);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s;}
   .doc-ic:hover svg{stroke:#fff;}
   .lab{font-size:12.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:18px 0 8px;font-weight:600;}
   .opts{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;}
@@ -68,8 +71,8 @@
   @media(max-width:900px){
     .card{grid-template-columns:1fr;gap:18px;align-items:start;}
     .stage{aspect-ratio:4/3;max-height:56vh;}
-    .doc-ic{width:40px;height:40px;border-radius:10px;}   /* инструкции видимы и на мобайле; тап-таргет крупнее */
-    .doc-ic svg{width:20px;height:20px;}
+    .doc-ic{width:38px;height:38px;border-radius:10px;}   /* инструкции видимы и на мобайле; тап-таргет крупнее */
+    .doc-ic svg{width:19px;height:19px;}
     .price-val{font-size:26px;}
     .feat{padding:20px 18px;margin-top:20px;}
     .feat-grid{grid-template-columns:1fr;gap:16px;}
@@ -93,8 +96,10 @@
     <div class="price-break" id="pBreak">—</div>
     <div class="docs">
       <span class="docs-lb">Инструкции</span>
-      <a class="doc-ic" id="actPdf" title="Инструкция по монтажу (PDF)" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M18 21H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8l6 6v10a2 2 0 0 1-2 2z"/><path d="M9 13h6M9 17h4"/></svg></a>
-      <a class="doc-ic" id="actVideo" title="Видео-инструкция монтажа"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M11 9.4l4.2 2.6-4.2 2.6z"/></svg></a>
+      <div class="docs-row">
+        <a class="doc-ic" id="actPdf" title="Инструкция по монтажу (PDF)" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M18 21H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8l6 6v10a2 2 0 0 1-2 2z"/><path d="M9 13h6M9 17h4"/></svg></a>
+        <a class="doc-ic" id="actVideo" title="Видео-инструкция монтажа"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M11 9.4l4.2 2.6-4.2 2.6z"/></svg></a>
+      </div>
     </div>
     <div class="lab">Цвет</div>
     <div class="opts sws" id="sw"></div>
