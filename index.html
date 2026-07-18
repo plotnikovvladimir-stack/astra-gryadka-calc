@@ -143,17 +143,14 @@
 /* ===================== НАСТРОЙКИ (редактировать здесь) ===================== */
 const CFG={
   priceModule900: 2300,   // цена модуля из 2 длинных секций (900 мм), руб
-  priceModule485: 1400,   // цена модуля из 2 коротких секций (485 мм), руб
   beigeMarkup:    1.15,   // бежевый дороже (1.15 = +15%)
   currency:       ' ₽',
-  secLong:        900,    // длина длинной секции, мм
-  secShort:       485,    // длина короткой секции, мм
+  secLong:        900,    // длина длинной секции, мм (эта версия — только модули 900)
   bedWidth:       900,    // ШИРИНА грядки (поперёк), мм — меняется для др. конфигураций
   wallGap:        55,     // мм: внешний = +wallGap, внутренний = −wallGap
   bedHeight:      320,    // ВЫСОТА грядки внешняя, мм — меняется для др. конфигураций
   soilDepth:      300,    // высота засыпки грунта, мм
   weightModule900: 21,    // вес модуля 900 мм (2 секции), кг
-  weightModule485: 9.2,   // вес модуля 485 мм (2 секции), кг
   configAnchor:   '#astra-configs',  // якорь блока с конфигурациями ниже на странице Tilda
   videoAnchor:    '#astra-video',    // якорь блока с ВИДЕО-инструкцией ниже на странице Tilda
   pdfUrl:         '',                // ссылка на PDF-инструкцию по монтажу (откроется в новой вкладке); пусто → «скоро»
@@ -164,9 +161,9 @@ const CFG={
 };
 /* ========================================================================== */
 function imgUrl(c,n){return CFG.imgBase+c+'/'+n+'.webp';}
-// Предзагрузка 7 размеров текущего цвета — переключение размеров остаётся мгновенным.
+// Предзагрузка 5 размеров текущего цвета — переключение размеров остаётся мгновенным.
 const _preloaded={};
-function preloadColor(c){if(_preloaded[c])return;_preloaded[c]=true;for(let n=1;n<=7;n++){const im=new Image();im.src=imgUrl(c,n);}}
+function preloadColor(c){if(_preloaded[c])return;_preloaded[c]=true;for(let n=1;n<=5;n++){const im=new Image();im.src=imgUrl(c,n);}}
 const COLORS=[
   {key:'brown',name:'Коричневый',sw:'#5E4630'},
   {key:'gray', name:'Серый',     sw:'#8C8C89'},
@@ -175,24 +172,22 @@ const COLORS=[
   {key:'red',  name:'Красный',   sw:'#9B3D2E'}
 ];
 const _p=new URLSearchParams(location.search);
-let N=Math.max(1,Math.min(7,+_p.get('n')||1)), color=_p.get('c')||'brown', front=true;
+let N=Math.max(1,Math.min(5,+_p.get('n')||1)), color=_p.get('c')||'brown', front=true;
 const imgs=[document.getElementById('imgA'),document.getElementById('imgB')];
 function fmt(x){return String(Math.round(x)).replace(/\B(?=(\d{3})+(?!\d))/g,' ');}
 function colorName(){const c=COLORS.find(x=>x.key===color);return c?c.name:color;}
 function spec(n){
-  const big=Math.floor((n+1)/2), sh=(n%2===0)?1:0;
-  const sum=big*CFG.secLong+sh*CFG.secShort;
-  return {n900:big+1, n485:sh,
+  // Размер n (1..5) = n+1 модулей 900 мм: n=1 → 2 мод (0.96 м) … n=5 → 6 мод (4.56 м).
+  const sum=n*CFG.secLong;
+  return {n900:n+1,
     lenExt:sum+CFG.wallGap, widExt:CFG.bedWidth+CFG.wallGap,
     lenInt:sum-CFG.wallGap, widInt:CFG.bedWidth-CFG.wallGap};
 }
-function units(){const k=(color==='beige')?CFG.beigeMarkup:1;return {u900:Math.round(CFG.priceModule900*k),u485:Math.round(CFG.priceModule485*k)};}
+function units(){const k=(color==='beige')?CFG.beigeMarkup:1;return {u900:Math.round(CFG.priceModule900*k)};}
 function order(){
   const sp=spec(N), u=units();
-  const price=sp.n900*u.u900+sp.n485*u.u485;
-  let parts=['модули 900 мм — '+sp.n900+' шт × '+fmt(u.u900)+CFG.currency];
-  if(sp.n485) parts.push('модули 485 мм — '+sp.n485+' шт × '+fmt(u.u485)+CFG.currency);
-  let breakText=parts.join('; ');
+  const price=sp.n900*u.u900;
+  let breakText='модули 900 мм — '+sp.n900+' шт × '+fmt(u.u900)+CFG.currency;
   if(color==='beige') breakText+='; бежевый +15%';
   return {sp,u,price,breakText};
 }
@@ -211,7 +206,7 @@ function update(){
   document.getElementById('mWid').textContent=(Math.round(sp.widExt/10)/100).toFixed(2)+' м';
   document.getElementById('mHgt').textContent=(Math.round(CFG.bedHeight/10)/100).toFixed(2)+' м';
   document.getElementById('mSoil').textContent=Math.round(soilL)+' л';
-  const weight=sp.n900*CFG.weightModule900+sp.n485*CFG.weightModule485;
+  const weight=sp.n900*CFG.weightModule900;
   document.getElementById('aux').textContent='Площадь посадки — '+areaM.toFixed(2)+' м² · вес ~'+(Math.round(weight*10)/10)+' кг';
   document.querySelectorAll('#chips .chip').forEach(el=>el.classList.toggle('on',+el.dataset.n===N));
   document.querySelectorAll('#sw .sw').forEach(el=>el.classList.toggle('on',el.dataset.c===color));
@@ -251,7 +246,7 @@ function reportHeight(){
 }
 /* ---- Инициализация UI ---- */
 const chips=document.getElementById('chips');
-for(let k=1;k<=7;k++){const b=document.createElement('button');b.className='chip';b.dataset.n=k;b.textContent=k;b.onclick=()=>{N=k;update();};chips.appendChild(b);}
+for(let k=1;k<=5;k++){const b=document.createElement('button');b.className='chip';b.dataset.n=k;b.textContent=k;b.onclick=()=>{N=k;update();};chips.appendChild(b);}
 const sw=document.getElementById('sw');
 COLORS.forEach(c=>{const b=document.createElement('button');b.className='sw';b.dataset.c=c.key;b.style.background=c.sw;b.title=c.name;b.setAttribute('aria-label',c.name);b.onclick=()=>{color=c.key;update();};sw.appendChild(b);});
 document.getElementById('cartBtn').onclick=addToCart;
