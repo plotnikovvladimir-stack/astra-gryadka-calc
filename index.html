@@ -187,7 +187,7 @@ function units(){const k=(color==='beige')?CFG.beigeMarkup:1;return {u900:Math.r
 function order(){
   const sp=spec(N), u=units();
   const price=sp.n900*u.u900;
-  let breakText='модули 900 мм — '+sp.n900+' шт × '+fmt(u.u900)+CFG.currency;
+  let breakText='комплект модулей 900 мм — '+sp.n900+' шт × '+fmt(u.u900)+CFG.currency;
   if(color==='beige') breakText+='; бежевый +15%';
   return {sp,u,price,breakText};
 }
