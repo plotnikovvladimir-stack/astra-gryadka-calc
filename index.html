@@ -162,6 +162,8 @@ const CFG={
   bedHeight:      320,    // ВЫСОТА грядки внешняя, мм — меняется для др. конфигураций
   soilDepth:      300,    // высота засыпки грунта, мм
   weightModule900: 21,    // вес модуля 900 мм (2 секции), кг
+  // «Состав для склада» (лид Bitrix24, см. ../cart-bom/README.md): позиция 1С, к ней дописывается цвет.
+  bomName900:     'Комплект модулей 900 мм, низкий (2 секции + 4 распорки)',
   configAnchor:   '#configuration',  // якорь блока с конфигурациями ниже на странице Tilda
   videoAnchor:    '#video-instruction', // якорь блока ВИДЕО-инструкции на странице Tilda (внутренний скролл через мост astra:scrollTo)
   videoEnabled:   true,              // видео-иконка показана; клик → скролл к videoAnchor на странице (не внешняя ссылка).
@@ -214,6 +216,9 @@ function order(){
   if(color==='beige') breakText+='; бежевый +15%';
   return {sp,u,price,breakText};
 }
+// Состав для склада: позиции 1С на ОДНУ грядку (qty — шт, unit — цена за шт). Покупателю не показывается.
+function bom(){const o=order(),c=colorName().toLowerCase();
+  return [{name:CFG.bomName900+', '+c, qty:o.sp.n900, unit:o.u.u900}];}
 function cartImgUrl(){return imgUrl(color,N);}
 function update(){
   const cur=front?imgs[0]:imgs[1], nxt=front?imgs[1]:imgs[0];
@@ -245,7 +250,8 @@ function cartProduct(){
     uid:'astra-'+color+'-'+N, id:'astra-'+color+'-'+N, name:name,
     price:o.price, quantity:1, img:cartImgUrl(), url:CFG.productUrl||location.href,
     option:[{option:'Цвет',variant:colorName()},{option:'Размер',variant:size},{option:'Состав',variant:o.breakText}],
-    descr:o.breakText
+    descr:o.breakText,
+    astra_bom:bom()   // → скрипт в футере Tilda → скрытое поле корзины → лид Bitrix24 «Состав для склада»
   };
 }
 function addToCart(){
