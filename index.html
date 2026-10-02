@@ -247,7 +247,9 @@ function cartProduct(){
   const size=sp.lenExt+'×'+sp.widExt+'×'+CFG.bedHeight+' мм';
   const name='Грядка АСТРА — '+colorName()+', '+size;
   return {
-    uid:'astra-'+color+'-'+N, id:'astra-'+color+'-'+N, name:name,
+    // uid 'astra1-' (раньше 'astra-', как и у старой v2): старая строка v2 'astra-…' в корзине покупателя
+    // (корзина живёт 30 дней) иначе слилась бы с новой v1 того же цвета/размера в строку с ценой 0.
+    uid:'astra1-'+color+'-'+N, id:'astra1-'+color+'-'+N, name:name,
     price:o.price, quantity:1, img:cartImgUrl(), url:CFG.productUrl||location.href,
     option:[{option:'Цвет',variant:colorName()},{option:'Размер',variant:size},{option:'Состав',variant:o.breakText}],
     descr:o.breakText,
